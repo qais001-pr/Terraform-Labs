@@ -1,17 +1,18 @@
 // VPC
-resource "aws_vpc" "main" {
+resource "aws_vpc" "terraform_vpc_lab" {
+
   cidr_block           = var.cidr_block
   enable_dns_support   = true
   enable_dns_hostnames = true
 
   tags = {
-    Name = "minishop-vpc-lab"
+    Name = "terraform-vpc-lab"
   }
 }
 
 # Public Subnet 1
 resource "aws_subnet" "public-subnet-A" {
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = aws_vpc.terraform_vpc_lab.id
   cidr_block              = var.public_subnet_A
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = true
@@ -23,7 +24,7 @@ resource "aws_subnet" "public-subnet-A" {
 
 # Public Subnet 2
 resource "aws_subnet" "public-subnet-B" {
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = aws_vpc.terraform_vpc_lab.id
   cidr_block              = var.public_subnet_B
   availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = true
@@ -36,7 +37,7 @@ resource "aws_subnet" "public-subnet-B" {
 
 # Private Subnet 1
 resource "aws_subnet" "private-subnet-A" {
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = aws_vpc.terraform_vpc_lab.id
   cidr_block              = var.private_subnet_A
   availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = false
@@ -47,7 +48,7 @@ resource "aws_subnet" "private-subnet-A" {
 
 # Private Subnet 2
 resource "aws_subnet" "private-subnet-B" {
-  vpc_id                  = aws_vpc.main.id
+  vpc_id                  = aws_vpc.terraform_vpc_lab.id
   cidr_block              = var.private_subnet_B
   availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = false
@@ -58,7 +59,7 @@ resource "aws_subnet" "private-subnet-B" {
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.terraform_vpc_lab.id
   tags = {
     Name = "minishop-internet-gateway"
   }
@@ -67,7 +68,7 @@ resource "aws_internet_gateway" "igw" {
 
 # Public Route Table
 resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.terraform_vpc_lab.id
   tags = {
     Name = "minishop-demo-public-route-table"
   }
@@ -76,7 +77,7 @@ resource "aws_route_table" "public_route_table" {
 
 # Private Route Table 
 resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = aws_vpc.terraform_vpc_lab.id
   tags = {
     Name = "minishop-demo-private-route-table"
   }
@@ -122,7 +123,7 @@ resource "aws_eip" "nat" {
 resource "aws_nat_gateway" "private_nat_gateway" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public-subnet-A.id
-  depends_on = [ aws_internet_gateway.igw ]
+  depends_on    = [aws_internet_gateway.igw]
   tags = {
     Name = "minishop-nat-gateway"
   }
